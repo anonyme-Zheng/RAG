@@ -1,0 +1,7 @@
+elasticsearch>=7.17.12
+FlagEmbedding
+torch
+PyPDF2
+langchain==0.1.16
+jsonlines 
+openai
