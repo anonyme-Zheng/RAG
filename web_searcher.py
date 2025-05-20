@@ -1,4 +1,4 @@
-from open_client import client
+from openai_client import client
 
 def web_search(query, num_results=5):
     prompt = f"""
