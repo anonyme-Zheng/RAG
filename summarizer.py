@@ -1,6 +1,6 @@
 from open_client import client
 
-def summarize_docs(docs: str) -> str:
+def summarize(docs: str) -> str:
     n = docs.count("\n\n") + 1 if docs else 0
   
     prompt = """
