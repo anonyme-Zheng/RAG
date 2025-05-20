@@ -19,4 +19,20 @@ def retrieve(query: str, top_k: int = 5):
       "_source": True
     }
     resp = es.search(index="financial_report_data", body=dsl)
+
+    snippets: list[str] = []
+    for hit in resp["hits"]["hits"]:
+        score       = hit["_score"]
+        source      = hit["_source"]
+        ticker      = src.get("ticker", "")
+        company     = src.get("company_name", "")
+        chunk       = src.get("chunk", "")
+        report_time = src.get("report_time", "")
+        text = (
+            f" [{score:.4f}] {company}（{ticker}）｜ {report_time}\n"
+            f" {chunk}"
+        )
+        snippets.append(text)
+
+    return snippets
     return [hit["_source"] for hit in resp["hits"]["hits"]]
