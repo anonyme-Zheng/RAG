@@ -1,4 +1,4 @@
-from open_client import client
+from openai_client import client
 
 def summarize(docs: str) -> str:
     n = docs.count("\n\n") + 1 if docs else 0
