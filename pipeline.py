@@ -2,6 +2,8 @@ import argparse
 from pathlib import Path
 from typing import List
 
+import gradio as gr
+
 from elasticsearch import helpers
 
 import es
@@ -64,15 +66,30 @@ def run_pipeline(query: str, history: str = "", top_k: int = 5) -> str:
     return answer
 
 
+def launch_web_ui():
+    """Launch a Gradio chat interface for the pipeline."""
+
+    def respond(message: str, history: list[list[str]]):
+        hist = "\n".join(
+            f"human: {user}\nbot: {bot}" for user, bot in history
+        )
+        return run_pipeline(message, hist)
+
+    gr.ChatInterface(respond, title="RAG Pipeline").launch(share=True)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run retrieval augmented pipeline")
     parser.add_argument("--txt_dir", help="TXT directory to ingest", default=None)
     parser.add_argument("--query", help="Question to ask", default=None)
     parser.add_argument("--history", help="History dialogue", default="")
+    parser.add_argument("--web", action="store_true", help="Launch Gradio web UI")
     args = parser.parse_args()
 
     if args.txt_dir:
         ingest_data(args.txt_dir)
 
-    if args.query:
+    if args.web:
+        launch_web_ui()
+    elif args.query:
         print(run_pipeline(args.query, args.history))
