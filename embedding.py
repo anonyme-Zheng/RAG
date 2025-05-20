@@ -1,4 +1,5 @@
 import argparse
+import os
 import re
 import uuid
 from pathlib import Path
@@ -18,9 +19,11 @@ text_splitter = RecursiveCharacterTextSplitter(
     separators=["\n\n", "\n", "。", "！", "？", ".", "!", "?"]
 )
 
-model = FlagAutoModel.from_finetuned('BAAI/bge-large-zh-v1.5',
-                                      query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
-                                      use_fp16=True)
+model = FlagAutoModel.from_finetuned(
+    "BAAI/bge-large-zh-v1.5",
+    query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：",
+    use_fp16=True,
+)
 
 def embed(texts: list[str]) -> list[list[float]]:
     
@@ -45,11 +48,11 @@ company_lookup: dict[str, str] = {
     "688256": "中科寒武纪科技股份有限公司",
 }
 
-def gen_actions(txt_path: Path):
+def gen_actions(txt_path: Path, index_name: str = "financial_report_data") -> Iterator[dict]:
     ticker = txt_path.parent.name                 
     year_match = re.search(r"\d{4}", txt_path.stem)
     year  = year_match.group() if year_match else "0000"
-    company = company_lookup.get(ticker, "未知公司") if company_lookup else "未知公司"
+    company = company_lookup.get(ticker, "未知公司")
     
     text  = txt_path.read_text(encoding="utf-8")
     chunks = text_splitter.split_text(text)
@@ -58,24 +61,22 @@ def gen_actions(txt_path: Path):
     title = f"{company} {year} 年报"
     title_vec = embed([title])[0] 
 
-    index_name = "financial_report_data"   
-
     for i, (chunk, vec) in enumerate(zip(chunks, vecs)):
         uid = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{ticker}_{year}_{i}"))
         yield {
             "_index": index_name,
-            "_id":    uid,
+            "_id": uid,
             "_source": {
-                "title":        title,
-                "chunk":        chunk,
+                "title": title,
+                "chunk": chunk,
                 "company_name": company,
-                "doc_id":       uid,
-                "ticker":       ticker,
-                "report_time":  f"{year}-12-31 00:00:00",
+                "doc_id": uid,
+                "ticker": ticker,
+                "report_time": f"{year}-12-31 00:00:00",
                 "title_vector": title_vec,
-                "chunk_vector":  vec         
-            }
-}
+                "chunk_vector": vec,
+            },
+        }
 
 
 def parse_args():

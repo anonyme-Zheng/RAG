@@ -1,7 +1,8 @@
 from pathlib import Path
+import argparse
 import PyPDF2
 import re
-import os
+
 
 
 def pdf_to_text(pdf_path: str | Path) -> str:

@@ -1,6 +1,7 @@
 from openai_client import client
 
-def generate_answer(passages, net_summary, query):
+
+def generate_answer(kb_context: str, summary: str, query: str) -> str:
 
     prompt = f"""
 # 角色：金融咨询助手
@@ -16,7 +17,7 @@ def generate_answer(passages, net_summary, query):
 ## 输入
 ### 资料块（已按相关度排序）
 {kb_context}
-{c}
+{summary}
 ### 用户问题
 {query}
 
