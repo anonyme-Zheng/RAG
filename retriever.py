@@ -1,3 +1,4 @@
+import es
 from elasticsearch import Elasticsearch
 from embedding import model
 
