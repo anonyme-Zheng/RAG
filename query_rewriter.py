@@ -1,7 +1,5 @@
 import re
-from openai import OpenAI
 from openai_client import client
-import os
 
 
 def rewrite_query(history_dialogue: str, query: str):
