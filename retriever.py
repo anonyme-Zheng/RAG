@@ -1,4 +1,5 @@
 from elasticsearch import Elasticsearch
+from embedding import model
 
 def retrieve(query: str, top_k: int = 5):
     """向 ES 发起检索，返回最相关的 chunk 列表"""
