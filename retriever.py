@@ -1,3 +1,5 @@
+from elasticsearch import Elasticsearch
+
 def retrieve(query: str, top_k: int = 5):
     """向 ES 发起检索，返回最相关的 chunk 列表"""
     q_vec = model.encode([query])[0].tolist()
