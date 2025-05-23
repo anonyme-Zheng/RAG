@@ -22,3 +22,21 @@ class Config:
     ES_HOST = "http://localhost:9200"
     MODEL_NAME = "BAAI/bge-large-zh-v1.5"
     TOP_K = 5
+
+
+
+#5.完善Web界面
+# 在pipeline.py中添加因子挖掘选项卡
+def launch_web_ui():
+    with gr.Blocks() as demo:
+        with gr.Tab("金融问答"):
+            # 现有的问答界面
+            pass
+        
+        with gr.Tab("因子挖掘"):
+            # 因子挖掘界面
+            factor_input = gr.Textbox(label="因子描述")
+            factor_output = gr.Textbox(label="结果")
+            factor_btn = gr.Button("生成因子")
+    
+    demo.launch()
