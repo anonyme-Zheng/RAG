@@ -17,7 +17,7 @@ def load_stock_data(instruments="csi300", start_time="2018-01-01", end_time="202
     """加载股票数据"""
     data = D.features(
         instruments=instruments,
-        fields=["$open", "$close", "$high", "$low", "$volume", "$change"],
+        fields=["$change", "$factor", "$low", "$volume", "$close", "$high", "$open"],
         start_time=start_time,
         end_time=end_time
     )
