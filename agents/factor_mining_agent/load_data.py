@@ -25,10 +25,13 @@ def load_stock_data(instruments="csi300", start_time="2018-01-01", end_time="202
 
 def get_factor_data(factor_expression, instruments="csi300", start_time="2018-01-01", end_time="2023-12-31"):
     """计算因子数据"""
-    factor_data = D.features(
-        instruments=instruments,
-        fields=[factor_expression],
-        start_time=start_time,
-        end_time=end_time
-    )
-    return factor_data
+    try: 
+        factor_data = D.features(
+            instruments=instruments,
+            fields=[factor_expression],
+            start_time=start_time,
+            end_time=end_time
+        )
+        return factor_data
+    except Exception as e:
+        raise ValueError(f"因子计算失败: {e}")
