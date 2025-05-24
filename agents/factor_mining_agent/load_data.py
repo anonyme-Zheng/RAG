@@ -2,10 +2,16 @@
 import qlib
 from qlib.data import D
 import pandas as pd
+from qlib.constant import REG_CN
+
+!python scripts/get_data.py qlib_data --target_dir ~/.qlib/qlib_data/cn_data --region cn
+provider_uri = "~/.qlib/qlib_data/cn_data"  # 目标目录
+qlib.init(provider_uri=provider_uri, region=REG_CN)
 
 def init_qlib():
     """初始化qlib"""
-    qlib.init(provider_uri="~/.qlib/qlib_data/cn_data", region="cn")
+    qlib.init(provider_uri=provider_uri, region=REG_CN)
+
 
 def load_stock_data(instruments="csi300", start_time="2018-01-01", end_time="2023-12-31"):
     """加载股票数据"""
