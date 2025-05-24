@@ -3,11 +3,12 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from agents.factor_mining_agent.query_rewriter import rewrite_query_for_factor_agent
-from agents.factor_mining_agent.factor_generator import generate_factor_formula
-from agents.factor_mining_agent.load_data import get_factor_data, init_qlib
-from agents.factor_mining_agent.factor_evaluator import FactorEvaluator
-from agents.factor_mining_agent.factor_storage import save_factor, load_factor_library
+from agents.factor_mining_agent.query_rewriter import *
+from agents.factor_mining_agent.factor_generator import *
+from agents.factor_mining_agent.load_data import *
+from agents.factor_mining_agent.factor_evaluator import *
+from agents.factor_mining_agent.factor_storage import *
+from agents.factor_mining_agent.backtest import *
 
 # 初始化qlib
 init_qlib()
