@@ -1,37 +1,50 @@
-# agents/factor_mining_agent/factor_evaluator.py
 import pandas as pd
 import numpy as np
-from scipy import stats
 
-class FactorEvaluator:
-    def __init__(self):
-        pass
+def evaluate_simple(df):
+    """
+    只计算：年化收益、夏普、日均换手、最大回撤
+    假设 df 是 multiindex 列，第一层 '1day'，第二层含 'account','turnover'…
+    """
+    # 先把列降成一级
+    if isinstance(df.columns, pd.MultiIndex):
+        df = df['1day']
+    # 取净值和换手
+    nav      = df['account']      # 资金净值
+    turnover = df['turnover']     # 日换手率
     
-    def evaluate_factor(self, factor_data: pd.DataFrame, return_data: pd.DataFrame):
-        """评估因子效果"""
-        results = {}
-        
-        # IC分析
-        ic_series = self.calculate_ic(factor_data, return_data)
-        results['ic_mean'] = ic_series.mean()
-        results['ic_std'] = ic_series.std()
-        results['ic_ir'] = results['ic_mean'] / results['ic_std']
-        
-        # 单调性分析
-        results['monotonicity'] = self.calculate_monotonicity(factor_data, return_data)
-        
-        return results
+    # 1) 年化收益
+    daily_ret   = nav.pct_change().dropna()
+    total_years = len(daily_ret) / 252
+    total_ret   = nav.iloc[-1] / nav.iloc[0] - 1
+    annual_ret  = (1 + total_ret) ** (1/total_years) - 1
     
-    def calculate_ic(self, factor_data, return_data):
-        """计算信息系数"""
-        ic_list = []
-        for date in factor_data.index.get_level_values(0).unique():
-            factor_cross = factor_data.loc[date].dropna()
-            return_cross = return_data.loc[date].dropna()
-            
-            common_stocks = factor_cross.index.intersection(return_cross.index)
-            if len(common_stocks) > 10:
-                ic = factor_cross.loc[common_stocks].corrwith(return_cross.loc[common_stocks])
-                ic_list.append(ic.iloc[0])
-        
-        return pd.Series(ic_list)
+    # 2) 年化波动 & 夏普
+    ann_vol = daily_ret.std() * np.sqrt(252)
+    sharpe  = annual_ret / ann_vol if ann_vol != 0 else np.inf
+    
+    # 3) 日均换手率（原来 annual_turn = turnover.mean() * 252）
+    daily_turn = turnover.mean() 
+    
+    # 4) 最大回撤
+    running_max = nav.expanding().max()
+    drawdown    = (nav - running_max) / running_max
+    max_dd      = drawdown.min()
+    
+    return {
+        'Annual_Return':   annual_ret,
+        'Sharpe_Ratio':    sharpe,
+        'Daily_Turnover':  daily_turn,
+        'Max_Drawdown':    max_dd,
+    }
+
+def print_simple(results):
+    print("==== 简化版回测指标 ====")
+    print(f"年化收益率     : {results['Annual_Return']:.2%}")
+    print(f"夏普比率       : {results['Sharpe_Ratio']:.3f}")
+    print(f"日均换手率     : {results['Daily_Turnover']:.2%}")
+    print(f"最大回撤       : {results['Max_Drawdown']:.2%}")
+
+
+res = evaluate_simple(df1)
+print_simple(res)
